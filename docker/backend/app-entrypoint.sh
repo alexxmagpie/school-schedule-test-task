@@ -18,4 +18,6 @@ echo "--------------------STARTING TO RUN PROJECT TESTS-------------------------
 coverage run -m pytest
 coverage report -m
 
+python manage.py clear_cache
+
 uvicorn school_schedule.asgi:application --host 0.0.0.0 --port 8888 --workers 4
