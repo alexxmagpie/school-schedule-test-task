@@ -1,0 +1,51 @@
+version: '3.10'
+
+networks:
+  school-schedule-network:
+    driver: bridge
+
+services:
+  web:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
+    ports:
+      - "8888:8888"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DJANGO_SETTINGS_MODULE=school_schedule.settings
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DATABASE_NAME=school_schedule
+      - DATABASE_USER=school_schedule
+      - DATABASE_PASSWORD=school_schedule
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DEBUG=True
+    networks:
+      - school-schedule-network
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: school_schedule
+      POSTGRES_PASSWORD: school_schedule
+      POSTGRES_DB: school_schedule
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - school-schedule-network
+
+  redis:
+    restart: unless-stopped
+    image: redis:7.0.15-alpine
+    ports:
+      - "6380:6379"
+    networks:
+      - school-schedule-network
+
+volumes:
+  postgres_data: {}
