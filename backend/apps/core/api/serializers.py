@@ -8,6 +8,8 @@ from asgiref.sync import sync_to_async
 
 from django.db import models
 
+from rest_framework.fields import SkipField
+
 
 class ADRFModelSerializer(ModelSerializer):
     async def ato_representation(self, instance):

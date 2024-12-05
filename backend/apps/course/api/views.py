@@ -2,16 +2,15 @@ from datetime import datetime
 
 from django.core.cache import cache
 
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
-from apps.course.models import Schedule
-from apps.course.api.serializers import ScheduleSerializer
 
 from asgiref.sync import sync_to_async
 
 from adrf.views import APIView
+
+from apps.course.models import Schedule
+from apps.course.api.serializers import ScheduleSerializer
 
 
 class ScheduleAPIView(APIView):

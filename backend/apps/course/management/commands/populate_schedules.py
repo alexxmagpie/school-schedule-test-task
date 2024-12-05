@@ -1,9 +1,8 @@
-import sys
-
 from django.core.management.base import BaseCommand
 from django.db.utils import IntegrityError
 
 from apps.course.factories import ScheduleFactory
+
 
 class Command(BaseCommand):
     help = 'Populates the database with apps.course.models.Schedule test objects using Factory Boy'

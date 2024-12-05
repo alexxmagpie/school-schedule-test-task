@@ -1,25 +1,25 @@
-import pytest
+# pylint: disable=R0903
+
 import asyncio
 
 from datetime import datetime
 
-from asgiref.sync import sync_to_async
-
 from unittest.mock import patch, MagicMock
 
-from rest_framework import status
-from rest_framework.test import APIRequestFactory, force_authenticate
+import pytest
+
+from asgiref.sync import sync_to_async
 
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 
+from rest_framework import status
+from rest_framework.test import APIRequestFactory
+
 from apps.course.factories import CourseFactory, ScheduleFactory
-from apps.course.models import Schedule, Course
 
 from apps.course.api.views import ScheduleAPIView
 from apps.course.api.serializers import CourseSerializer, ScheduleSerializer
-
-from apps.teacher.models import Subject, Teacher
 
 from apps.student.factories import StudentFactory
 
@@ -59,8 +59,8 @@ class TestScheduleAPIView:
             'day_of_week': sample_data.day_of_week,
             'start_time': sample_data.start_time.strftime("%H:%M"),
         }]
-        
-        cache_key = f'schedules_all'
+
+        cache_key = 'schedules_all'
         cache.set(cache_key, response_data, timeout=60*3)
 
         response = await view(request)
@@ -84,8 +84,8 @@ class TestScheduleAPIView:
             'day_of_week': sample_data.day_of_week,
             'start_time': sample_data.start_time.strftime("%H:%M"),
         }]
-        
-        cache_key = f'schedules_True_None'
+
+        cache_key = 'schedules_True_None'
         cache.set(cache_key, response_data, timeout=60*3)
 
         response = await view(request)
@@ -109,7 +109,7 @@ class TestScheduleAPIView:
             'day_of_week': sample_data.day_of_week,
             'start_time': sample_data.start_time.strftime("%H:%M"),
         }]
-        
+
         cache_key = f'schedules_False_{sample_data.course.name}'
         cache.set(cache_key, response_data, timeout=60*3)
 
@@ -118,7 +118,8 @@ class TestScheduleAPIView:
         assert response.data == response_data
 
     async def test_get_today_class_schedules_cached(self, request_factory, view, schedule_factory):
-        sample_data = await sync_to_async(schedule_factory.create)(course__name='TEST_COURSE', day_of_week=datetime.today().strftime('%A'))
+        sample_data = await sync_to_async(schedule_factory.create)(
+            course__name='TEST_COURSE', day_of_week=datetime.today().strftime('%A'))
         request = request_factory.get('/api/schedule/', {'for_today': 'true', 'class_name': sample_data.course.name})
         response_data = [{
             'course': {
@@ -134,7 +135,7 @@ class TestScheduleAPIView:
             'day_of_week': sample_data.day_of_week,
             'start_time': sample_data.start_time.strftime("%H:%M"),
         }]
-        
+
         cache_key = f'schedules_True_{sample_data.course.name}'
         cache.set(cache_key, response_data, timeout=60*3)
 
@@ -178,7 +179,8 @@ class TestScheduleAPIView:
                 }]
 
     async def test_get_today_class_schedules_not_cached(self, request_factory, view, schedule_factory):
-        sample_data = await sync_to_async(schedule_factory.create)(course__name='TEST_COURSE', day_of_week=datetime.today().strftime('%A'))
+        sample_data = await sync_to_async(schedule_factory.create)(
+            course__name='TEST_COURSE', day_of_week=datetime.today().strftime('%A'))
         request = request_factory.get('/api/schedule/', {'for_today': 'true', 'class_name': sample_data.course.name})
 
         cache_key = f'schedules_True_{sample_data.course.name}'
@@ -216,7 +218,7 @@ class TestScheduleAPIView:
         sample_data = await sync_to_async(schedule_factory.create)(day_of_week=datetime.today().strftime('%A'))
         request = request_factory.get('/api/schedule/', {'for_today': 'true'})
 
-        cache_key = f'schedules_True_None'
+        cache_key = 'schedules_True_None'
         cache.delete(cache_key)
 
         with patch('apps.course.api.views.ScheduleAPIView.get_schedules') as mock_get_schedules:
@@ -288,8 +290,8 @@ class TestCourseSerializer:
     def test_course_serializer(self):
         course = CourseFactory.create(name="Math 101")
 
-        student_1 = StudentFactory.create(name="John Doe", course=course)
-        student_2 = StudentFactory.create(name="Jane Doe", course=course)
+        StudentFactory.create(name="John Doe", course=course)
+        StudentFactory.create(name="Jane Doe", course=course)
 
         serializer = CourseSerializer(course)
         data = serializer.data
